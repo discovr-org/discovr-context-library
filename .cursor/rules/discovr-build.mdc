@@ -1,0 +1,35 @@
+---
+description: discovr — always load project skills before building; update context library after durable changes
+alwaysApply: true
+---
+
+# discovr build gate
+
+Before writing or changing product code, UI, copy, structure, or APIs: **Read** the matching skills under `.cursor/skills/<name>/SKILL.md` (and their `reference.md` when the task is non-trivial). Skim `context/CURRENT.md` when present. Do not invent brand, voice, layout, or API rules.
+
+| Work | Read first |
+| --- | --- |
+| Product / UX / pricing / inventory choice | `discovr-principles` |
+| Any screen or component | `discovr-interface` + `discovr-brand` |
+| Any user-facing string | `discovr-voice` |
+| New file or folder | `discovr-structure` |
+| Logo, favicon, splash, manifest icons | `discovr-logo` |
+| PWA, launch, a11y, perf | `discovr-ship` |
+| React / TypeScript implementation | `discovr-code` |
+| Backend / `discovr-backend/` / Supabase / APIs / auth / SMS | `discovr-backend` |
+| `@supabase/server` / auth modes / admin client | `supabase-server` |
+| Updating skills or living system notes | `discovr-context` |
+
+## After durable work
+
+If you changed APIs, modules, env names, skills, or lasting product decisions: update `discovr-context-library` (or mirrored `.cursor/` + `context/CURRENT.md`) in the same session and push — see skill `discovr-context`.
+
+## Always true
+
+- Tokens only — raw hex in components is a bug.
+- One `brand-primary` fill per screen.
+- Full wordmark only — never a monogram.
+- Every listing carries a one-line verdict.
+- Dark-only — no light theme machinery.
+- Folder shape: `features|shared/<name>/{components,utils,styles}`.
+- Backend: one API process; HTTP → module facades only (`catalog`, `communication`, `user`, `auth`).
