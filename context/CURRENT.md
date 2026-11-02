@@ -68,3 +68,8 @@ Guest app feed, search, saved, and experience detail load only from `/v1/catalog
 - Any admin write (listing or host create / edit / delete, cover or avatar upload) clears it, so edits show on the next request.
 - Manual: `POST /v1/admin/cache/cards/refresh` clears and re-caches; admin Dashboard has a "Refresh home feed" button.
 - Cache is per process: a Render restart or cold start starts empty and pays one database read.
+
+## Legal pages
+
+- `/legal/privacy`, `/legal/terms`, `/legal/disclaimer` share `features/legal/components/LegalPage.tsx`. Old `/privacy` and `/terms` redirect (308) in `next.config.ts`.
+- Privacy has an analytics on/off switch (`ConsentSettings`) stored on the device for 12 months (`features/legal/utils/analyticsConsent.ts`). PostHog is not installed yet; when it is, it must check `isAnalyticsOn()` before loading.
