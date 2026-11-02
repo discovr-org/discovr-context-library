@@ -47,9 +47,10 @@ Guest app feed, search, saved, and experience detail load only from `/v1/catalog
 
 ## Guest home
 
-- Big wordmark + "Goa, from people who know where to go", search, then chips. Past the search bar the chip row sticks to the top with a small wordmark.
-- Place rows (sundowners, nightlife, OG local bars, cocktails, eat like a Goan local) are portrait swipe rails: name, area, heart. Experience rows (surfing, wakeboarding, padel, mudbath, tattoo, pottery) are one big landscape card: photo, title, verdict line, area · duration, "From ₹X", heart. Kayaking is a portrait rail with prices (`feed_sections.show_price`).
-- Migration `010_feed_layout.sql` sets titles, density, order, `show_price`, folds mangrove kayaking into one Kayaking rail, and fills `content.format` (venue for place rails, trip for the rest). The API reads `show_price` but falls back if 010 isn't applied.
+- Big wordmark + "Goa, from people who know where to go", then search. Past the search bar a top bar slides in with a small wordmark and the chips (Tonight, This weekend, Near me, Under ₹1,000, Food and drink, Nightlife, Wellness).
+- The frontend owns the home feed: `HOME_SECTIONS` in `discovr-frontend/src/features/home/utils/homeSections.ts` holds each section's title, layout (`rail` = tall swipe cards with name, area, heart; `stack` = one big card each with photo, title, verdict line, area · duration, "From ₹X", heart), listing slugs and order. Sections with no live listings are hidden. There is no `feed_sections` table.
+- `GET /v1/catalog/cards` returns every published listing with an active host as a flat card list (no layout, no sections). Migration `010_listing_format.sql` only fills `content.format`.
+- APIs send raw values, not display text: `durationMinutes` (cards and detail) and no fallback photo. The frontend formats duration (`shared/utils/formatDuration.ts`) and picks the fallback image.
 
 ## Guest detail
 
@@ -61,9 +62,9 @@ Guest app feed, search, saved, and experience detail load only from `/v1/catalog
 - Phone normalising lives in `api/src/shared/phone.ts` (auth + user share it).
 - New `content` keys (admin edit form): `walkIn` (venues), `pitch`, `fitnessLevel`, `instructorRatio`, `healthAdvisory`, `carry[]`, `knowBeforeYouGo[]`. Admin save now keeps content keys the form doesn't edit.
 
-## Feed cache
+## Cards cache
 
-- `GET /v1/catalog/feed` is cached in API memory for 24 hours (`ListFeed`). Concurrent misses share one Supabase read.
+- `GET /v1/catalog/cards` is cached in API memory for 24 hours (`ListCards`). Concurrent misses share one Supabase read.
 - Any admin write (listing or host create / edit / delete, cover or avatar upload) clears it, so edits show on the next request.
-- Manual: `POST /v1/admin/cache/feed/refresh` clears and re-caches; admin Dashboard has a "Refresh home feed" button.
+- Manual: `POST /v1/admin/cache/cards/refresh` clears and re-caches; admin Dashboard has a "Refresh home feed" button.
 - Cache is per process: a Render restart or cold start starts empty and pays one database read.

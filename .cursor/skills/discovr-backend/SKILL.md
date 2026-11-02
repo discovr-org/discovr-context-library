@@ -82,7 +82,7 @@ Do **not** add `discovr-backend/gateway` or `discovr-backend/catalog` as separat
 
 ## Schema mindset (Headout-like, Gen Z curated)
 
-- **Editorial feed** (`feed_sections` + items) is not the same table as `experiences`. Curators compose rails; inventory is the listing.
+- **No layout or feed curation in the backend.** The API serves listings (`GET /v1/catalog/cards`, detail by slug); the frontend decides sections, order and how cards render.
 - **Hosts** are first-class. Listings do not embed host columns that drift.
 - **Photos / inclusions / menu pages** are child tables (ordered).
 - **Tags** power Tonight / weekend / vibe filters.

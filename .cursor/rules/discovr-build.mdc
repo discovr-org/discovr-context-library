@@ -33,3 +33,4 @@ If you changed APIs, modules, env names, skills, or lasting product decisions: u
 - Dark-only — no light theme machinery.
 - Folder shape: `features|shared/<name>/{components,utils,styles}`.
 - Backend: one API process; HTTP → module facades only (`catalog`, `communication`, `user`, `auth`).
+- Frontend owns UI/UX: layout, sections, order, how things look, and UI logic. Backend owns data, user-level logic and auth. No layout or display hints in tables or API responses.

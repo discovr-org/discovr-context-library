@@ -35,7 +35,6 @@ See migration: `discovr-backend/api/supabase/migrations/001_init.sql`.
 - `experience_photos` / `experience_inclusions` / `experience_menu_pages` — ordered children
 - `experience_tags` — filter tags
 - `reviews` — raw reviews; aggregates denormalised on experiences
-- `feed_sections` + `feed_section_items` — editorial rails (not inventory)
 
 ## Folder map
 
