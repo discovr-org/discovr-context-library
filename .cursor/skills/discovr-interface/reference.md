@@ -29,9 +29,9 @@ The screen an ExperienceCard opens. Until bookings launch, discovr is discovery 
 1. Hero gallery: every photo for the listing, full bleed, swiped one at a time, with a count. No text on the photos, and no photos anywhere else on the screen.
 2. AppBar over it: back, the title (shown once the gallery has scrolled away), share, save.
 3. Title in `display-md`, `space-5` below the gallery, then the byline "by Mangrove Trails" in `body` `ink-muted`, `space-1` below.
-4. InfoList, `space-5` below: price and who it is paid to; the place, linked to its exact pin in Google Maps; today's status and times, opening a Monday-first week with today highlighted; duration and group size.
-5. Verdict, `space-5` below: "Our verdict" overline and one or two sentences in our voice, as a quotation on a hairline rule.
-6. ActionRow, `space-5` below: Call, Directions, Instagram, Share.
+4. InfoList, `space-5` below: for trips — price (+ taxes / inclusive); the place pin; today's trip status and times (Monday-first week); duration and group size. For venues / bars — no price or people row; neighborhood as the place line; open/closed now with today's hours (expand for days / notes).
+5. Verdict, `space-5` below: trips keep "Our verdict" overline; venues are quote-only on a hairline rule. One or two sentences in our voice.
+6. ActionRow, `space-5` below: Call, Directions, Instagram, Share (Instagram omitted only when there is no handle).
 7. A `line-subtle` rule `space-6` below, then the long-form sections `space-6` apart, each a `title` heading with `space-3` to its content: About; Menu, only for venues with one (see MenuPages); What's included as a FactList; Your host with the Avatar host row; the PolicyDisclosure with the booking and cancellation policy, closed, showing the free-cancellation cut-off; and last, the Disclaimer footnote, a quiet line that opens discovr's standard disclaimer.
 8. BookingBar in its call-to-book form: price, "Call to book", and who picks up. Fixed at every scroll position.
 9. TabBar, hidden while the gallery is on screen; past it, it and the AppBar hide on scroll down and come back on scroll up. When it appears, the BookingBar rides up on top of it.
