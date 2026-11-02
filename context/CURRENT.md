@@ -45,10 +45,18 @@ Frontend / admin: `NEXT_PUBLIC_API_BASE_URL` (no trailing slash). Local `http://
 
 Guest app feed, search, saved, and experience detail load only from `/v1/catalog/*` (no frontend seed/demo listings). Detail maps API `content` (FAQs, meeting point, links) and listing `hours`; cover photo fills empty `photos`. `public/demo/` assets may still be referenced by cover URLs in the DB until real uploads replace them.
 
-## Guest detail (venues)
+## Guest home
 
-- Venue / bar listings: InfoList is place + open/closed hours only (no price, no people). Verdict is quote-only (no "Our verdict" label). ActionRow is Call / Directions / Instagram / Share.
-- Trip listings keep price, trip week, duration/people, and the verdict label.
+- Big wordmark + "Goa, from people who know where to go", search, then chips. Past the search bar the chip row sticks to the top with a small wordmark.
+- Place rows (sundowners, nightlife, OG local bars, cocktails, eat like a Goan local) are portrait swipe rails: name, area, heart. Experience rows (surfing, wakeboarding, padel, mudbath, tattoo, pottery) are one big landscape card: photo, title, verdict line, area · duration, "From ₹X", heart. Kayaking is a portrait rail with prices (`feed_sections.show_price`).
+- Migration `010_feed_layout.sql` sets titles, density, order, `show_price`, folds mangrove kayaking into one Kayaking rail, and fills `content.format` (venue for place rails, trip for the rest). The API reads `show_price` but falls back if 010 isn't applied.
+
+## Guest detail
+
+- Place vs experience: `content.format` (`venue` / `trip`), else tags. Full section order lives in skill `discovr-interface` reference ("The detail screen").
+- Place: name only, area + open/closed, quote, 4 actions, About (italic + photo), Price, Menu, disclaimer + links, More in Goa (2 columns), bar "Ask for the price" + "Call to book".
+- Experience: "by {host}", price / area / open today / duration + group, quote, 4 actions, About (italic pitch + description + photo), Details, included / not included boxes, The process, Health advisory, Things to get with you, Know before you go, FAQs, Run by card, disclaimer + links, More in Goa, bar with "or book on {host}" when `content.links.book` is set.
+- New `content` keys (admin edit form): `pitch`, `fitnessLevel`, `instructorRatio`, `healthAdvisory`, `carry[]`, `knowBeforeYouGo[]`. Admin save now keeps content keys the form doesn't edit.
 
 ## Feed cache
 

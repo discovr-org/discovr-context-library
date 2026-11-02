@@ -26,19 +26,22 @@ Everything to keep in mind while designing screens for discovr. Written for a da
 
 The screen an ExperienceCard opens. Until bookings launch, discovr is discovery only and hands the user to the host, so the screen ends in contact, not checkout. Its order is fixed:
 
-1. Hero gallery: every photo for the listing, full bleed, swiped one at a time, with a count. No text on the photos, and no photos anywhere else on the screen.
+1. Hero gallery: every photo for the listing, full bleed, swiped one at a time, with a "1 / 3" count. No text on the photos. The only other photo is the one at the end of About.
 2. AppBar over it: back, the title (shown once the gallery has scrolled away), share, save.
-3. Title in `display-md`, `space-5` below the gallery, then the byline "by Mangrove Trails" in `body` `ink-muted`, `space-1` below.
-4. InfoList, `space-5` below: for trips — price (+ taxes / inclusive); the place pin; today's trip status and times (Monday-first week); duration and group size. For venues / bars — no price or people row; neighborhood as the place line; open/closed now with today's hours (expand for days / notes).
-5. Verdict, `space-5` below: trips keep "Our verdict" overline; venues are quote-only on a hairline rule. One or two sentences in our voice.
+3. Title in `display-md`, `space-5` below the gallery. Experiences add the byline "by Surf Wala" in `body` `ink-muted`, `space-1` below. Places show the name only.
+4. InfoList, `space-5` below: for experiences — price per person (+ taxes / inclusive); the area pin; "Open today" and the slot times; duration and group size. For places — no price or people row; the area pin; open/closed now with today's hours (expand for days / notes).
+5. Verdict, `space-5` below: quote-only on a hairline rule, no label. One or two sentences in our voice.
 6. ActionRow, `space-5` below: Call, Directions, Instagram, Share (Instagram omitted only when there is no handle).
-7. A `line-subtle` rule `space-6` below, then the long-form sections `space-6` apart, each a `title` heading with `space-3` to its content: About; Menu, only for venues with one (see MenuPages); What's included as a FactList; Your host with the Avatar host row; the PolicyDisclosure with the booking and cancellation policy, closed, showing the free-cancellation cut-off; and last, the Disclaimer footnote, a quiet line that opens discovr's standard disclaimer.
-8. BookingBar in its call-to-book form: price, "Call to book", and who picks up. Fixed at every scroll position.
+7. A `line-subtle` rule `space-6` below, then the long-form sections `space-6` apart, each a `title` heading with `space-3` to its content. Blocks with no data are skipped.
+   - **Place (bar, restaurant):** About (description in italics, then a photo); Price (the sheet's line, e.g. "₹3,000 for two (approx)"); Menu (cover + "7 pages"); Know before you go and FAQs only when the listing has them.
+   - **Experience:** About (italic short pitch, description, photo); Details (Age, Fitness level, Student to instructor ratio); What's included (ticks) and What's not included (crosses) as two boxes side by side; The process (1 Find it, 2 Call and book, 3 Show up); Health advisory (the one `state-notice` box); Things to get with you (checklist); Know before you go (tips box; falls back to the booking and cancellation notes plus the final-terms line); FAQs (tap to open); "Run by / Hosted by / Owned by {host}" card with the verified line.
+   - **Both, last:** the Disclaimer box ("Read the full disclaimer"), the "Report wrong information" and "Any problems with the experience? Contact us" links, then More in Goa as a 2-column grid.
+8. BookingBar. Experiences: "From ₹3,000 per person", "Call to book", and "or book on {host}" when the listing has a booking link (else who picks up). Places: "Ask for the price" and "Call to book". Fixed at every scroll position.
 9. TabBar, hidden while the gallery is on screen; past it, it and the AppBar hide on scroll down and come back on scroll up. When it appears, the BookingBar rides up on top of it.
 
 **Key details before the verdict.** The ExperienceCard has already shown the verdict, so someone who taps through is deciding whether they can go: price, place and time answer that. The verdict follows immediately, still above the fold on a 390 by 844 screen, so the opinion is never more than a glance away.
 
-No ratings and no reviews: everything listed is a pick, and the verdict carries our view. No badges while there is no inventory to be honest about. No meeting point section: the place row in the InfoList and the Directions tile already cover it. When bookings launch, the BookingBar switches from calling to its booking states and the TabBar behaviour stays the same.
+No ratings and no reviews: everything listed is a pick, and the verdict carries our view. No badges while there is no inventory to be honest about. No meeting point section: the place row in the InfoList and the Directions tile already cover it. Place vs experience comes from `content.format` (`venue` / `trip`); without it, tags decide. When bookings launch, the BookingBar switches from calling to its booking states and the TabBar behaviour stays the same.
 
 States: populated, loading (skeletons at the gallery, title, InfoList, verdict and ActionRow dimensions, with the bars shown), offline (notice Banner above the title), error (EmptyState in place of the content, "Try again" as a secondary Button).
 
