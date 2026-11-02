@@ -56,7 +56,10 @@ Guest app feed, search, saved, and experience detail load only from `/v1/catalog
 - Place vs experience: `content.format` (`venue` / `trip`), else tags. Full section order lives in skill `discovr-interface` reference ("The detail screen").
 - Place: name only, area + open/closed, quote, 4 actions, About (italic + photo), Price, Menu, disclaimer + links, More in Goa (2 columns), bar "Ask for the price" + "Call to book".
 - Experience: "by {host}", price / area / open today / duration + group, quote, 4 actions, About (italic pitch + description + photo), Details, included / not included boxes, The process, Health advisory, Things to get with you, Know before you go, FAQs, Run by card, disclaimer + links, More in Goa, bar with "or book on {host}" when `content.links.book` is set.
-- New `content` keys (admin edit form): `pitch`, `fitnessLevel`, `instructorRatio`, `healthAdvisory`, `carry[]`, `knowBeforeYouGo[]`. Admin save now keeps content keys the form doesn't edit.
+- Bars: BookingBar + TabBar always on; AppBar turns slim/solid past the photo and never hides.
+- Footer (`SiteFooter`, home + detail): links, `POST /v1/trip-updates` WhatsApp signup (user module, table `trip_update_signups`, migration `011_trip_updates.sql`), legal line, faded wordmark.
+- Phone normalising lives in `api/src/shared/phone.ts` (auth + user share it).
+- New `content` keys (admin edit form): `walkIn` (venues), `pitch`, `fitnessLevel`, `instructorRatio`, `healthAdvisory`, `carry[]`, `knowBeforeYouGo[]`. Admin save now keeps content keys the form doesn't edit.
 
 ## Feed cache
 

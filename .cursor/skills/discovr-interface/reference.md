@@ -27,17 +27,18 @@ Everything to keep in mind while designing screens for discovr. Written for a da
 The screen an ExperienceCard opens. Until bookings launch, discovr is discovery only and hands the user to the host, so the screen ends in contact, not checkout. Its order is fixed:
 
 1. Hero gallery: every photo for the listing, full bleed, swiped one at a time, with a "1 / 3" count. No text on the photos. The only other photo is the one at the end of About.
-2. AppBar over it: back, the title (shown once the gallery has scrolled away), share, save.
+2. AppBar over it: back, share, save. Past the photo it turns into a slim solid bar with back, the name, share, save. It never hides.
 3. Title in `display-md`, `space-5` below the gallery. Experiences add the byline "by Surf Wala" in `body` `ink-muted`, `space-1` below. Places show the name only.
 4. InfoList, `space-5` below: for experiences — price per person (+ taxes / inclusive); the area pin; "Open today" and the slot times; duration and group size. For places — no price or people row; the area pin; open/closed now with today's hours (expand for days / notes).
-5. Verdict, `space-5` below: quote-only on a hairline rule, no label. One or two sentences in our voice.
+5. Verdict, `space-5` below: quote-only, italic, on a hairline rule, no label. One or two sentences in our voice.
 6. ActionRow, `space-5` below: Call, Directions, Instagram, Share (Instagram omitted only when there is no handle).
 7. A `line-subtle` rule `space-6` below, then the long-form sections `space-6` apart, each a `title` heading with `space-3` to its content. Blocks with no data are skipped.
-   - **Place (bar, restaurant):** About (description in italics, then a photo); Price (the sheet's line, e.g. "₹3,000 for two (approx)"); Menu (cover + "7 pages"); Know before you go and FAQs only when the listing has them.
+   - **About (both):** a small "About" label, the listing name again as a `display-md` heading, the italic story, then one photo.
+   - **Place (bar, restaurant):** About; Prices (the sheet's line, e.g. "1800 for two (approx)"); Menu only when it has page images. No tips, FAQs, process or host card.
    - **Experience:** About (italic short pitch, description, photo); Details (Age, Fitness level, Student to instructor ratio); What's included (ticks) and What's not included (crosses) as two boxes side by side; The process (1 Find it, 2 Call and book, 3 Show up); Health advisory (the one `state-notice` box); Things to get with you (checklist); Know before you go (tips box; falls back to the booking and cancellation notes plus the final-terms line); FAQs (tap to open); "Run by / Hosted by / Owned by {host}" card with the verified line.
-   - **Both, last:** the Disclaimer box ("Read the full disclaimer"), the "Report wrong information" and "Any problems with the experience? Contact us" links, then More in Goa as a 2-column grid.
-8. BookingBar. Experiences: "From ₹3,000 per person", "Call to book", and "or book on {host}" when the listing has a booking link (else who picks up). Places: "Ask for the price" and "Call to book". Fixed at every scroll position.
-9. TabBar, hidden while the gallery is on screen; past it, it and the AppBar hide on scroll down and come back on scroll up. When it appears, the BookingBar rides up on top of it.
+   - **Both, last:** the Disclaimer box ("Read the full disclaimer"), the "Report wrong information" and "Any problems with the experience? Contact us" links, More in Goa as a 2-column grid (photo, name, area, heart, price when it has one), then the SiteFooter: "discovr the best of what Goa has to offer", WhatsApp + phone, Saved / About us / How we pick / List with us / Help, the "Planning your Goa trip soon?" WhatsApp signup ("Keep me posted", secondary button), © discovr 2026 · Privacy · Terms · Disclaimer, and a giant faded wordmark.
+8. BookingBar. Experiences: "From ₹3,000 per person", "Call to book", and "or book on {host}" when the listing has a booking link (else who picks up). Places: "Ask for the price", "You'll speak to {place} directly." plus "No booking needed, just walk in" when `content.walkIn` is set, and "Call to book". Fixed at every scroll position.
+9. TabBar always on screen, with the BookingBar sitting on top of it.
 
 **Key details before the verdict.** The ExperienceCard has already shown the verdict, so someone who taps through is deciding whether they can go: price, place and time answer that. The verdict follows immediately, still above the fold on a 390 by 844 screen, so the opinion is never more than a glance away.
 
