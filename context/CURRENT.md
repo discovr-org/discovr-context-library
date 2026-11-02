@@ -49,3 +49,10 @@ Guest app feed, search, saved, and experience detail load only from `/v1/catalog
 
 - Venue / bar listings: InfoList is place + open/closed hours only (no price, no people). Verdict is quote-only (no "Our verdict" label). ActionRow is Call / Directions / Instagram / Share.
 - Trip listings keep price, trip week, duration/people, and the verdict label.
+
+## Feed cache
+
+- `GET /v1/catalog/feed` is cached in API memory for 24 hours (`ListFeed`). Concurrent misses share one Supabase read.
+- Any admin write (listing or host create / edit / delete, cover or avatar upload) clears it, so edits show on the next request.
+- Manual: `POST /v1/admin/cache/feed/refresh` clears and re-caches; admin Dashboard has a "Refresh home feed" button.
+- Cache is per process: a Render restart or cold start starts empty and pays one database read.
