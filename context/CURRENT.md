@@ -28,7 +28,9 @@ HTTP talks only to module facades (`CatalogService`, `AuthService`, `UserService
 - Support / customer phone (`+918169992510`) is **not** the Twilio From for OTP.
 - OTP copy shape: `{code} is your discovr code. It works for 10 minutes. Do not share it with anyone.`
 - Session: opaque token returned as `sessionId`; client sends `Authorization: Bearer <sessionId>`.
-- Tables: `users`, `auth_otps`, `auth_sessions` (migration `007_auth_users_sessions.sql`).
+- Tables: `users`, `auth_otps`, `auth_sessions` (migration `007_auth_users_sessions.sql`), `user_saves` (migration `008_user_saves.sql`).
+- Guest saves live in `localStorage` (`discovr.saved`) until login; after OTP verify the PWA merges local + remote and `PUT /v1/me/saves`. Also `GET/PUT/DELETE /v1/me/saves` (+ `PUT/DELETE /v1/me/saves/:slug`).
+- Save heart and Profile tab open signup when signed out; the heart still writes localStorage immediately.
 - Local override: `AUTH_DATA_SOURCE=memory` when Supabase auth tables are missing; catalog can stay on supabase.
 
 ## Images
@@ -41,4 +43,4 @@ Backend: `SUPABASE_*`, `CATALOG_DATA_SOURCE`, `AUTH_DATA_SOURCE`, `CLOUDFLARE_*`
 
 Frontend / admin: `NEXT_PUBLIC_API_BASE_URL` (no trailing slash). Local `http://127.0.0.1:8080`; production = Render API HTTPS origin. Must be present at Next **build** time.
 
-Guest app feed, search, saved, and experience detail load from `/v1/catalog/*` when the base URL is set (no local seed fallback on the home feed). Detail maps API `content` (FAQs, meeting point, links) and listing `hours`; cover photo fills empty `photos`.
+Guest app feed, search, saved, and experience detail load only from `/v1/catalog/*` (no frontend seed/demo listings). Detail maps API `content` (FAQs, meeting point, links) and listing `hours`; cover photo fills empty `photos`. `public/demo/` assets may still be referenced by cover URLs in the DB until real uploads replace them.

@@ -49,9 +49,16 @@ discovr-backend/api/src/
   shared/errors.ts
   catalog/                   # listings
   communication/             # SMS (Twilio)
-  user/                      # guest users by phone
+  user/                      # guest users by phone + user_saves
   auth/                      # OTP + sessions
 ```
+
+## User saves
+
+- Table: `user_saves` (`user_id`, `experience_slug`) — migration `008_user_saves.sql`.
+- Routes (Bearer session): `GET/PUT /v1/me/saves`, `PUT/DELETE /v1/me/saves/:slug`.
+- Guest PWA keeps slugs in `localStorage` until login, then syncs via `PUT /v1/me/saves`.
+
 
 ## Splitting later
 
