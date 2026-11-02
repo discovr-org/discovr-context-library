@@ -39,4 +39,6 @@ HTTP talks only to module facades (`CatalogService`, `AuthService`, `UserService
 
 Backend: `SUPABASE_*`, `CATALOG_DATA_SOURCE`, `AUTH_DATA_SOURCE`, `CLOUDFLARE_*`, `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER`, `CORS_ORIGIN`, `API_PORT`.
 
-Frontend / admin: `NEXT_PUBLIC_API_BASE_URL` → `http://127.0.0.1:8080`.
+Frontend / admin: `NEXT_PUBLIC_API_BASE_URL` (no trailing slash). Local `http://127.0.0.1:8080`; production = Render API HTTPS origin. Must be present at Next **build** time.
+
+Guest app feed, search, saved, and experience detail load from `/v1/catalog/*` when the base URL is set (no local seed fallback on the home feed). Detail maps API `content` (FAQs, meeting point, links) and listing `hours`; cover photo fills empty `photos`.
