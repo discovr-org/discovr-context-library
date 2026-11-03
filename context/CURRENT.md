@@ -35,11 +35,11 @@ HTTP talks only to module facades (`CatalogService`, `AuthService`, `UserService
 
 ## Images
 
-- Admin cover / host avatar uploads go through Cloudflare Images (`CLOUDFLARE_TOKEN`). Prefer Images API token over Global `cfk_` key.
+- Admin cover / host avatar uploads go to Cloudflare R2 bucket `assets`, served at `https://cdn.discovr.in/images/<uuid>.<ext>` (`R2ImageUploader`, used when `CLOUDFLARE_ACCOUNT_ID` + `R2_ACCESS_KEY_ID` + `R2_SECRET_ACCESS_KEY` + `R2_BUCKET` + `R2_PUBLIC_URL` are all set). Falls back to Cloudflare Images (`CLOUDFLARE_TOKEN`). Old-site photos stay on `media.discovr.in` — do not repoint it.
 
 ## Env names (no values)
 
-Backend: `SUPABASE_*`, `CATALOG_DATA_SOURCE`, `AUTH_DATA_SOURCE`, `CLOUDFLARE_*`, `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER`, `CORS_ORIGIN`, `API_PORT`.
+Backend: `SUPABASE_*`, `CATALOG_DATA_SOURCE`, `AUTH_DATA_SOURCE`, `CLOUDFLARE_*`, `R2_*`, `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER`, `CORS_ORIGIN`, `API_PORT`.
 
 Frontend / admin: `NEXT_PUBLIC_API_BASE_URL` (no trailing slash). Local `http://127.0.0.1:8080`; production = Render API HTTPS origin. Must be present at Next **build** time.
 
