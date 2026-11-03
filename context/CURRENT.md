@@ -49,6 +49,8 @@ Backend: `SUPABASE_*`, `CATALOG_DATA_SOURCE`, `AUTH_DATA_SOURCE`, `CLOUDFLARE_*`
 
 Frontend / admin: `NEXT_PUBLIC_API_BASE_URL` (no trailing slash). Local `http://127.0.0.1:8080`; production = Render API HTTPS origin. Must be present at Next **build** time.
 
+Guest app analytics: `NEXT_PUBLIC_POSTHOG_KEY` (project "discovr", EU; empty = analytics off), `NEXT_PUBLIC_POSTHOG_HOST=/ingest`. `app_version` reads Vercel's `NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA`.
+
 Guest app feed, search, saved, and experience detail load only from `/v1/catalog/*` (no frontend seed/demo listings). Detail maps API `content` (FAQs, meeting point, links) and listing `hours`; cover photo fills empty `photos`. `public/demo/` assets may still be referenced by cover URLs in the DB until real uploads replace them.
 
 ## Guest home
@@ -78,8 +80,21 @@ Guest app feed, search, saved, and experience detail load only from `/v1/catalog
 - Manual: `POST /v1/admin/cache/cards/refresh` clears and re-caches; admin Dashboard has a "Refresh home feed" button.
 - Cache is per process: a Render restart or cold start starts empty and pays one database read.
 
+## Analytics (PostHog, guest app only)
+
+- Boot: `src/instrumentation-client.ts` calls `bootAnalytics()` (`shared/analytics/utils/posthog.ts`). Loads only with a key and analytics on. EU, `person_profiles: identified_only`, history-change pageviews, pageleave, autocapture, exceptions. Replays mask every input plus anything with `data-ph-mask` (phone on Profile and in the sign-in sheet).
+- Proxy: `next.config.ts` rewrites `/ingest/static|array/*` to `eu-assets.i.posthog.com` and `/ingest/*` to `eu.i.posthog.com` (`skipTrailingSlashRedirect: true`).
+- Every event gets `page_type` (home, experience, saved, search, profile, info), `app_surface` (pwa / browser), `app_version`.
+- Identity: `AuthProvider` calls `identifyUser(userId)` on sign-in and for returning sessions, `resetUser()` on sign-out. Internal id only.
+- Rules: one typed list, `shared/analytics/utils/events.ts` (`EventMap`, `object_action` snake_case). Send only through `track(event, props)`. No name, phone or email fields: the `NoPii` type fails the build if one is added. Free text the user typed (help message, report note) is never sent; only fixed options (`category`, `kind`) and the search query.
+- Cards: wrap a list in `<TrackList list section… layout>` and pass `track={cardTrack(item, index)}` to `ExperienceCard`. Card events carry slug, title, format, price_inr, place, list (home / search / saved / more_in_goa), section_id/title, position (1-based), layout, search_query. A card click stores its source in sessionStorage so `experience_viewed` reports `source_list / source_section / source_position`.
+- Views: `useTrackView` (50% on screen, or filling half the screen, for 1 s; zero-height markers count when on screen) for cards, home sections, story start/end. `useScrollDepth` sends 25/50/75/100 on home and listings.
+- Events: discovery `experience_card_viewed`, `experience_card_clicked`, `home_section_viewed`, `search_performed` (600 ms after typing stops). Listing `experience_viewed`, `story_viewed`, `story_completed`, `faq_opened`, `hero_photo_changed`, `menu_opened`, `menu_page_viewed`, `hours_expanded`, `directions_clicked`, `call_clicked`, `share_clicked`, `report_opened`, `report_submitted`, `scroll_depth`. Conversion `book_clicked` (main success event), `experience_saved` / `experience_unsaved` (`from`). Sign-in `auth_sheet_opened`, `otp_requested`, `otp_verified`, `otp_failed`, `name_submitted`, `auth_sheet_closed`, `signed_out`. Nav `tab_clicked`, `contact_sheet_opened`, `contact_clicked`, `footer_link_clicked`, `help_request_submitted`. Plus `analytics_opted_out`.
+- Shared components stay analytics-free where a feature owns the context: they take optional callbacks (`BookingBar.onBookClick`, `ActionRow.onAction`, `InfoList.onAction`, `HeroGallery.onIndexChange`, `MenuViewer.onPageChange`, `StoryBlocks.onFaqOpen`). Book buttons and tabs carry `data-attr`.
+- Dev: `ph.debug()` logs every event in the console. React Strict Mode sends `experience_viewed` twice in dev only.
+
 ## Legal pages
 
 - `/legal/privacy`, `/legal/terms`, `/legal/disclaimer` share `features/legal/components/LegalPage.tsx`. Old `/privacy` and `/terms` redirect (308) in `next.config.ts`.
-- Privacy has an analytics on/off switch (`ConsentSettings`) stored on the device for 12 months (`features/legal/utils/analyticsConsent.ts`). PostHog is not installed yet; when it is, it must check `isAnalyticsOn()` before loading.
+- Privacy has an analytics on/off switch (`ConsentSettings`) stored on the device for 12 months (`shared/analytics/utils/analyticsConsent.ts`). Turning it off sends `analytics_opted_out`, stops replays and opts PostHog out; turning it on loads or resumes PostHog.
 - Page chrome: `AppShell` renders `SiteFooter` on every screen (`footer={false}` to hide, `footerSource` for the signup source; defaults to the path). Text pages (About, How we pick, List with us, Help, `/legal/*`) live in `src/app/(info)/` and share `InfoShell` (nav, tab bar, gutters, footer).
