@@ -52,6 +52,18 @@ discovr-backend/api/src/
   auth/                      # OTP + sessions
 ```
 
+## Listing images (catalog, admin)
+
+- Tables: `experience_photos` (carousel, `sort_order`, `is_cover`) and `experience_menu_pages` (`sort_order`, `label`). Port `ExperienceMediaRepository` (rows only); cover rules live in use-cases.
+- The cover is one of the carousel photos (`is_cover`), copied into `experiences.cover_photo_url` / `cover_photo_alt` so cards and search read one column. Deleting the cover promotes the first remaining photo.
+- `GET /v1/admin/experiences/:id` returns `photos[]` (`id, src, alt, isCover`) and `menuPages[]` (`id, src, label, alt`).
+- `POST /v1/admin/experiences/:id/photos` (multipart `file`, optional `alt`, `cover=true`) adds at the end. `PUT …/photos` `{ photos: [{ id, alt }], coverId }` sends the full list in order. `DELETE …/photos/:photoId`.
+- `POST /v1/admin/experiences/:id/cover` = add photo + set as cover (kept for old clients).
+- `POST|PUT|DELETE /v1/admin/experiences/:id/menu-pages[/:pageId]`, same shape with `label`.
+- `POST /v1/admin/images` (multipart) returns `{ url }` for story `photo` blocks; the admin saves the URL into `content.blocks` with the listing.
+- Multipart text fields must come before the file. JPG/PNG/WebP/GIF, under 10MB (`application/image-file.ts`).
+- Cards: `imageSrc` = `cover_photo_url`, else the `is_cover` photo, else the first photo.
+
 ## User saves
 
 - Table: `user_saves` (`user_id`, `experience_slug`) — migration `008_user_saves.sql`.

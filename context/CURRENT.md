@@ -15,7 +15,7 @@ Update this file when durable facts change. Do not put secrets here.
 
 | Module | Owns |
 | --- | --- |
-| `catalog` | Experiences, hosts, feed, cover/avatar uploads |
+| `catalog` | Experiences, hosts, feed, listing photos / menu pages / story images, avatar uploads |
 | `communication` | SMS via Twilio (`SmsSender` → `TwilioSmsSender`) |
 | `user` | Guest users by `phone_e164` |
 | `auth` | OTP request/verify, opaque `sessionId`, `/v1/auth/*` |
@@ -38,7 +38,9 @@ HTTP talks only to module facades (`CatalogService`, `AuthService`, `UserService
 
 ## Images
 
-- Admin cover / host avatar uploads go to Cloudflare R2 bucket `assets`, served at `https://cdn.discovr.in/images/<uuid>.<ext>` (`R2ImageUploader`, used when `CLOUDFLARE_ACCOUNT_ID` + `R2_ACCESS_KEY_ID` + `R2_SECRET_ACCESS_KEY` + `R2_BUCKET` + `R2_PUBLIC_URL` are all set). Falls back to Cloudflare Images (`CLOUDFLARE_TOKEN`). Old-site photos stay on `media.discovr.in` — do not repoint it.
+- Admin edit listing manages every listing image: **Photos** (carousel; one is the cover), **Menu pages** (label per page), and **Story photos** (replace a `photo` block in `content.blocks`, saved with "Save changes"). Routes in skill `discovr-backend` reference, "Listing images".
+- Home cards use the cover, else the first carousel photo.
+- Admin, listing, host avatar and story uploads go to Cloudflare R2 bucket `assets`, served at `https://cdn.discovr.in/images/<uuid>.<ext>` (`R2ImageUploader`, used when `CLOUDFLARE_ACCOUNT_ID` + `R2_ACCESS_KEY_ID` + `R2_SECRET_ACCESS_KEY` + `R2_BUCKET` + `R2_PUBLIC_URL` are all set). Falls back to Cloudflare Images (`CLOUDFLARE_TOKEN`). Old-site photos stay on `media.discovr.in` — do not repoint it.
 
 ## Env names (no values)
 
@@ -69,7 +71,7 @@ Guest app feed, search, saved, and experience detail load only from `/v1/catalog
 ## Cards cache
 
 - `GET /v1/catalog/cards` is cached in API memory for 24 hours (`ListCards`). Concurrent misses share one Supabase read.
-- Any admin write (listing or host create / edit / delete, cover or avatar upload) clears it, so edits show on the next request.
+- Any admin write (listing or host create / edit / delete, listing photo add / reorder / delete, avatar upload) clears it, so edits show on the next request.
 - Manual: `POST /v1/admin/cache/cards/refresh` clears and re-caches; admin Dashboard has a "Refresh home feed" button.
 - Cache is per process: a Render restart or cold start starts empty and pays one database read.
 

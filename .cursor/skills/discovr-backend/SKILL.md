@@ -14,7 +14,7 @@ Read [reference.md](reference.md) for schema, folder map, and request flow.
 ## Always true
 
 1. **One deployable API process** (`discovr-backend/api`, port `8080`). The browser talks only to this origin — never to Supabase with a service key, never to a second Node port for catalog.
-2. **Modules stay separated by folder.** `catalog/` owns listings, hosts, feed, cover/avatar uploads. `communication/` owns SMS. `user/` owns guest users. `auth/` owns OTP + sessions. `http/` only routes and maps status codes. Future domains (e.g. `booking/`) get their own folder inside the same process until scale forces a split.
+2. **Modules stay separated by folder.** `catalog/` owns listings, hosts, feed, listing images (photos, menu pages, story images), avatar uploads. `communication/` owns SMS. `user/` owns guest users. `auth/` owns OTP + sessions. `http/` only routes and maps status codes. Future domains (e.g. `booking/`) get their own folder inside the same process until scale forces a split.
 3. **HTTP talks to module APIs only.** Each domain exposes one facade (e.g. `CatalogService`). Routes never import use-cases, repos, or Supabase. Other modules call the same facade — never each other’s internals.
 4. **SOLID is mandatory** — see below. Do not invent a parallel pattern.
 5. **Money is integers** (INR rupees). Never float.
