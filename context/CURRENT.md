@@ -40,8 +40,8 @@ HTTP talks only to module facades (`CatalogService`, `AuthService`, `UserService
 
 - Admin edit listing manages every listing image: **Photos** (carousel; one is the cover), **Menu pages** (label per page), and **Story photos** (replace a `photo` block in `content.blocks`, saved with "Save changes"). Routes in skill `discovr-backend` reference, "Listing images".
 - Home cards use the cover, else the first carousel photo. `ExperienceCard` swaps to the fallback image if a photo fails to load.
-- Nov 2026: `media.discovr.in` has no DNS record, so old-site photos (most listings, incl. menus and story photos) don't load. Re-upload through the admin (goes to `cdn.discovr.in`) or restore that host.
-- Admin, listing, host avatar and story uploads go to Cloudflare R2 bucket `assets`, served at `https://cdn.discovr.in/images/<uuid>.<ext>` (`R2ImageUploader`, used when `CLOUDFLARE_ACCOUNT_ID` + `R2_ACCESS_KEY_ID` + `R2_SECRET_ACCESS_KEY` + `R2_BUCKET` + `R2_PUBLIC_URL` are all set). Falls back to Cloudflare Images (`CLOUDFLARE_TOKEN`). Old-site photos stay on `media.discovr.in` — do not repoint it.
+- The only image host is `cdn.discovr.in` (R2 bucket `assets`). `media.discovr.in` was never ours and has no DNS record. Migration `012_story_blocks.sql` points ~160 old-site photos (carousel, menus, story) at `media.discovr.in/images/<id>`; those files are not in the bucket, so they don't load until the originals are put in R2 and the URLs rewritten, or they're re-uploaded through the admin.
+- Admin, listing, host avatar and story uploads go to Cloudflare R2 bucket `assets`, served at `https://cdn.discovr.in/images/<uuid>.<ext>` (`R2ImageUploader`, used when `CLOUDFLARE_ACCOUNT_ID` + `R2_ACCESS_KEY_ID` + `R2_SECRET_ACCESS_KEY` + `R2_BUCKET` + `R2_PUBLIC_URL` are all set). Falls back to Cloudflare Images (`CLOUDFLARE_TOKEN`).
 
 ## Env names (no values)
 
