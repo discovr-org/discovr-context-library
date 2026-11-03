@@ -31,6 +31,7 @@ HTTP talks only to module facades (`CatalogService`, `AuthService`, `UserService
 - Tables: `users`, `auth_otps`, `auth_sessions` (migration `007_auth_users_sessions.sql`), `user_saves` (migration `008_user_saves.sql`).
 - Guest saves live in `localStorage` (`discovr.saved`) until login; after OTP verify the PWA merges local + remote and `PUT /v1/me/saves`. Also `GET/PUT/DELETE /v1/me/saves` (+ `PUT/DELETE /v1/me/saves/:slug`).
 - Sign-up name step: `POST /v1/auth/otp/verify` returns `isNewUser` (true while `users.name` is empty, so drop-offs get asked again) and `name`. `PATCH /v1/me` `{ name }` saves the first name (max 40). Migration `013_user_name.sql`.
+- List with us: `POST /v1/host-applications` `{ name, phone, city, description }` (no account) → `host_applications` (migration `014_host_applications.sql`). Lives in the `user` module next to trip-update signups.
 - Save heart and Profile tab open signup when signed out; the heart still writes localStorage immediately.
 - Local override: `AUTH_DATA_SOURCE=memory` when Supabase auth tables are missing; catalog can stay on supabase.
 
