@@ -49,7 +49,7 @@ Backend: `SUPABASE_*`, `CATALOG_DATA_SOURCE`, `AUTH_DATA_SOURCE`, `CLOUDFLARE_*`
 
 Frontend / admin: `NEXT_PUBLIC_API_BASE_URL` (no trailing slash). Local `http://127.0.0.1:8080`; production = Render API HTTPS origin. Must be present at Next **build** time.
 
-Guest app analytics: `NEXT_PUBLIC_POSTHOG_KEY` (project "discovr", EU; empty = analytics off), `NEXT_PUBLIC_POSTHOG_HOST=/ingest`. `app_version` reads Vercel's `NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA`.
+Guest app analytics: `NEXT_PUBLIC_POSTHOG_KEY` (project "discovr-new", US; empty = analytics off), `NEXT_PUBLIC_POSTHOG_HOST=/ingest`. `app_version` reads Vercel's `NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA`.
 
 Guest app feed, search, saved, and experience detail load only from `/v1/catalog/*` (no frontend seed/demo listings). Detail maps API `content` (FAQs, meeting point, links) and listing `hours`; cover photo fills empty `photos`. `public/demo/` assets may still be referenced by cover URLs in the DB until real uploads replace them.
 
@@ -82,8 +82,8 @@ Guest app feed, search, saved, and experience detail load only from `/v1/catalog
 
 ## Analytics (PostHog, guest app only)
 
-- Boot: `src/instrumentation-client.ts` calls `bootAnalytics()` (`shared/analytics/utils/posthog.ts`). Loads only with a key and analytics on. EU, `person_profiles: identified_only`, history-change pageviews, pageleave, autocapture, exceptions. Replays mask every input plus anything with `data-ph-mask` (phone on Profile and in the sign-in sheet).
-- Proxy: `next.config.ts` rewrites `/ingest/static|array/*` to `eu-assets.i.posthog.com` and `/ingest/*` to `eu.i.posthog.com` (`skipTrailingSlashRedirect: true`).
+- Boot: `src/instrumentation-client.ts` calls `bootAnalytics()` (`shared/analytics/utils/posthog.ts`). Loads only with a key and analytics on. US cloud, `person_profiles: identified_only`, history-change pageviews, pageleave, autocapture, exceptions. Replays mask every input plus anything with `data-ph-mask` (phone on Profile and in the sign-in sheet).
+- Proxy: `next.config.ts` rewrites `/ingest/static|array/*` to `us-assets.i.posthog.com` and `/ingest/*` to `us.i.posthog.com` (`skipTrailingSlashRedirect: true`).
 - Every event gets `page_type` (home, experience, saved, search, profile, info), `app_surface` (pwa / browser), `app_version`.
 - Identity: `AuthProvider` calls `identifyUser(userId)` on sign-in and for returning sessions, `resetUser()` on sign-out. Internal id only.
 - Rules: one typed list, `shared/analytics/utils/events.ts` (`EventMap`, `object_action` snake_case). Send only through `track(event, props)`. No name, phone or email fields: the `NoPii` type fails the build if one is added. Free text the user typed (help message, report note) is never sent; only fixed options (`category`, `kind`) and the search query.
