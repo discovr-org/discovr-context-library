@@ -77,3 +77,4 @@ Guest app feed, search, saved, and experience detail load only from `/v1/catalog
 
 - `/legal/privacy`, `/legal/terms`, `/legal/disclaimer` share `features/legal/components/LegalPage.tsx`. Old `/privacy` and `/terms` redirect (308) in `next.config.ts`.
 - Privacy has an analytics on/off switch (`ConsentSettings`) stored on the device for 12 months (`features/legal/utils/analyticsConsent.ts`). PostHog is not installed yet; when it is, it must check `isAnalyticsOn()` before loading.
+- Page chrome: `AppShell` renders `SiteFooter` on every screen (`footer={false}` to hide, `footerSource` for the signup source; defaults to the path). Text pages (About, How we pick, List with us, Help, `/legal/*`) live in `src/app/(info)/` and share `InfoShell` (nav, tab bar, gutters, footer).
