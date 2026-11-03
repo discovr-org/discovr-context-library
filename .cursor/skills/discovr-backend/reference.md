@@ -56,6 +56,7 @@ discovr-backend/api/src/
 
 - Table: `user_saves` (`user_id`, `experience_slug`) — migration `008_user_saves.sql`.
 - Routes (Bearer session): `GET/PUT /v1/me/saves`, `PUT/DELETE /v1/me/saves/:slug`.
+- `PATCH /v1/me` `{ name }` (Bearer) sets first name; OTP verify returns `isNewUser` = no name yet.
 - Guest PWA keeps slugs in `localStorage` until login, then syncs via `PUT /v1/me/saves`.
 
 
