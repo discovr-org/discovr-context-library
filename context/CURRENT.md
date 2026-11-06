@@ -74,12 +74,32 @@ Guest app feed, search, saved, and experience detail load only from `/v1/catalog
 - Hours (`experiences.schedule`): `timeSlot` (usual hours), `closedDays[]` and `altDays[]` + `altTimeSlot` ("Mon" … "Sun", admin day pickers in "When"). Free-text `days` still works ("Closed Tuesday.", "Tuesdays off"). The app shows times as typed ranges ("8am – 1am", never "midnight", no "Open from"); best time lives in About, not the hours row.
 - New `content` keys (admin edit form): `walkIn` (venues), `pitch`, `fitnessLevel`, `instructorRatio`, `healthAdvisory`, `carry[]`, `knowBeforeYouGo[]`. Admin save now keeps content keys the form doesn't edit.
 
+## Admin dashboard (`discovr-admin`)
+
+- Pages: Dashboard (`/`), Listings, Hosts, Search, edit / add listing and host.
+- Dashboard "Needs attention" lists non-archived listings with gaps: no verdict, no photo, no price, or a published listing whose host is inactive. Photo check uses `hasPhoto` on `GET /v1/catalog/experiences` (cover URL or any carousel photo).
+- Guest "List with us" and Help submissions are not shown in the admin (a Requests inbox was built and removed on request). They sit in `host_applications` and `help_requests` (migrations `014`, `015`).
+- Data loading: one shared copy per list, `shared/utils/useCatalog.ts`. Listings and hosts load on their own (a page never waits for the list it does not use); in-flight requests are shared, shows the saved copy at once and refreshes in the background. Shell search, Dashboard, Listings, Hosts and Search all use it. After a write, call `reload()`.
+- Change first, save after (optimistic): set active/inactive, delete listing, host edit / active / delete update the screen at once via `patchExperienceLocal` / `removeExperienceLocal` / `patchHostLocal` / `removeHostLocal` (`useCatalog.ts`), then call the API. On failure the helper's `undo` puts that one row back and a toast says why. A load that started before a local change is dropped so it can't overwrite it. No refetch after success. Rule: new admin actions on listed rows follow this pattern. Not done this way yet: photo uploads, add listing / host, full edit-listing save (the table is patched after the save returns).
+- Edit listing: `dirty` flag warns on tab close (`beforeunload`), jump links to each section (`#sec-<name>`), sticky save bar says "Unsaved changes" or "All changes saved".
+- **No login.** `/v1/admin/*` is open to anyone who has the API URL. An email-OTP login (`@discovr.in` only, Cloudflare or Resend email) was built and then removed on request. Add it back before the API URL is shared widely.
+- Not done yet: sortable listing columns, filters kept in the URL, auto-refresh of the home feed after publish (today it is the Dashboard "Refresh home feed" button).
+
 ## Cards cache
 
 - `GET /v1/catalog/cards` is cached in API memory for 24 hours (`ListCards`). Concurrent misses share one Supabase read.
 - Any admin write (listing or host create / edit / delete, listing photo add / reorder / delete, avatar upload) clears it, so edits show on the next request.
-- Manual: `POST /v1/admin/cache/cards/refresh` clears and re-caches; admin Dashboard has a "Refresh home feed" button.
+- Manual: `POST /v1/admin/cache/cards/refresh` clears and re-caches (this instance only); admin Dashboard has a "Refresh home feed" button.
+- TTL is 60 s (was 24 h) so several API instances can only disagree for a minute.
 - Cache is per process: a Render restart or cold start starts empty and pays one database read.
+
+## Scaling guards (API)
+
+- Rate limits (`@fastify/rate-limit`, per IP, in-process counters, `trustProxy: true`): default 300 / min; `POST /v1/auth/otp/request` 5 / 10 min; `/v1/auth/otp/verify` 15 / 10 min; `/v1/trip-updates` 5 / 10 min; `/v1/host-applications` 3 / 10 min; `/v1/help-requests` 5 / 10 min. Over the cap: `429 { error: { code: "rate_limited" } }`. Helper `limit(max)` in `http/rate-limits.ts`. With N instances the real cap is N times higher; add a shared store if abuse shows up.
+- Sessions: `SessionCache` keeps token hash → user id for 60 s (max 10k). Routes that only need the id (`/v1/me/*`) call `AuthService.userIdFor`; `/v1/auth/me` still loads the user. Sign-out clears the entry on that instance; others keep it up to 60 s.
+- Migration `017_purge_auth.sql` schedules a nightly `pg_cron` job that deletes expired OTPs and old sessions (needs the `pg_cron` extension).
+- Admin lists (`GET /v1/catalog/experiences` and `/hosts`) use `StaleCache`: fresh 20 s, then served instantly while refreshing in the background up to 5 min, then wait. Any admin write drops them and reloads at once. Measured Nov 2026: Supabase answers in 0.15–0.5 s but the same list via the Render API took 1.5–2.2 s, so check that Render and Supabase share a region.
+- Not done: Cache-Control / CDN caching of `/v1/catalog/*`, admin login, paginated cards, monitoring.
 
 ## Analytics (PostHog, guest app only)
 

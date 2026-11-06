@@ -52,6 +52,10 @@ discovr-backend/api/src/
   auth/                      # OTP + sessions
 ```
 
+## Catalog list extras
+
+- `GET /v1/catalog/experiences` rows also carry `hasPhoto` (cover URL or any carousel photo).
+
 ## Listing images (catalog, admin)
 
 - Tables: `experience_photos` (carousel, `sort_order`, `is_cover`) and `experience_menu_pages` (`sort_order`, `label`). Port `ExperienceMediaRepository` (rows only); cover rules live in use-cases.
