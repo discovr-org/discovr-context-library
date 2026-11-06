@@ -131,9 +131,11 @@ Guest app feed, search, saved, and experience detail load only from `/v1/catalog
 ## Assistant (MCP)
 
 - Module `discovr-backend/api/src/assistant` (facade `AssistantService`, tools in `application/tools.ts`, input shapes in `domain/listing-input.ts`). Route: `http/mcp-routes.ts`. Stateless Streamable HTTP, SDK `@modelcontextprotocol/sdk`.
-- Tools: `find_hosts`, `list_listings` (read); `create_host_draft` (host `active: false`), `create_listing_draft` (`status: "draft"`, create then patch for hours / content / FAQs). Draft state is fixed in code, the AI cannot publish. Text only: no photos yet, ops adds them in the admin edit page.
+- Tools. Read: `find_hosts`, `list_listings`, `get_listing`, `needs_attention` (same gaps as the admin Dashboard, rule copied server-side), `find_place`. Draft: `create_host_draft` (host `active: false`), `create_listing_draft` (`status: "draft"`, create then patch). Edit: `update_listing` (merges `content` / `schedule` into what is stored because the repo replaces them wholesale; lists replace), `update_host`. Gated, marked `destructiveHint` so clients ask first: `set_listing_status`, `set_host_active`. No delete, no slug / host change. Drafts are the only create path, the AI cannot publish unless asked through `set_listing_status` (the use-case still needs a verdict). Text only: chat photos can't reach tools, so `get_photo_upload_link` returns the edit page `#sec-photos` (listing) or `/hosts` (avatar) for a human to upload.
+- `find_place`: port `PlaceFinder`, adapter `WebPlaceFinder`. Map link (reads `!3d/!4d`, `@lat,lng`, `?q=`, follows short links on Google hosts only) or OpenStreetMap Nominatim (India only, thin on small shacks, ~1 req/s). Swap in Google Places behind the port if it misses.
+- Field guide: `application/field-guide.ts` is sent as the MCP server `instructions` and as prompt `new_listing`. Voice rules mirror skill `discovr-voice`; update both together.
 - The AI uses ops' own subscription, so we pay no tokens.
 - **OAuth is a stub**: `/.well-known/*`, `/oauth/register|authorize|token` auto-approve, `/mcp` accepts any bearer token. Anyone with the API URL can use it. Replace with real admin login before sharing the URL.
 - Env: `ADMIN_URL` (optional, default `https://discovr-admin.vercel.app`) builds the review links the tools return.
 - Check: `cd discovr-backend/api && npx tsx scripts/check-assistant.ts`.
-- Not done: photos, edit tools, `ai_draft` flag, tool-call log, timeline / process steps (the guest app hardcodes "The Process").
+- Not done: photo tools that accept files (ChatGPT `openai/fileParams` could skip the upload link), `ai_draft` flag, tool-call log, real login, timeline / process steps (the guest app hardcodes "The Process").
