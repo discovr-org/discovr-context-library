@@ -19,6 +19,7 @@ Update this file when durable facts change. Do not put secrets here.
 | `communication` | SMS via Twilio (`SmsSender` → `TwilioSmsSender`) |
 | `user` | Guest users by `phone_e164` |
 | `auth` | OTP request/verify, opaque `sessionId`, `/v1/auth/*` |
+| `assistant` | MCP server (`POST /mcp`) so ops can draft hosts and listings from their own Claude / ChatGPT |
 
 HTTP talks only to module facades (`CatalogService`, `AuthService`, `UserService`, `CommunicationService`).
 
@@ -86,7 +87,7 @@ Guest app feed, search, saved, and experience detail load only from `/v1/catalog
 - Speed rules the admin follows (from the "How Linear is so fast" write-up): change the screen first and save after, no spinner for something that will almost always succeed; read from a local copy; animate only `transform`, `opacity` and colours, 80–160 ms, no list transitions, reduced motion respected; fonts via `next/font` (one preloaded Latin file each).
 - Not done this way: add listing / host and photo uploads (the server makes the id), render-only-the-changed-row (lists are ~25 rows, not worth it), service-worker precache.
 - Add listing makes a draft with the basics, then opens Edit, which holds every field the guest story page shows (pitch, About, price note, hours, included / not included, health advisory, things to bring, know before you go, FAQs, links, menu, policy, photos). Edit shows a "Finish setting up" card while the listing lacks a photo, verdict, About, price, hours or FAQs; each item jumps to its section.
-- Edit listing: `dirty` flag warns on tab close (`beforeunload`), jump links to each section (`#sec-<name>`), sticky save bar says "Unsaved changes" or "All changes saved".
+- Edit listing: `dirty` flag warns on tab close (`beforeunload`), jump bar pinned under the top bar (measured offsets in `--jump-top` / `--jump-offset`) that links to each section (`#sec-<name>`) and highlights the section you are in (`IntersectionObserver`, last tab at page bottom), sticky save bar says "Unsaved changes" or "All changes saved".
 - **No login.** `/v1/admin/*` is open to anyone who has the API URL. An email-OTP login (`@discovr.in` only, Cloudflare or Resend email) was built and then removed on request. Add it back before the API URL is shared widely.
 - Not done yet: sortable listing columns, filters kept in the URL, auto-refresh of the home feed after publish (today it is the Dashboard "Refresh home feed" button).
 
@@ -126,3 +127,13 @@ Guest app feed, search, saved, and experience detail load only from `/v1/catalog
 - `/legal/privacy`, `/legal/terms`, `/legal/disclaimer` share `features/legal/components/LegalPage.tsx`. Old `/privacy` and `/terms` redirect (308) in `next.config.ts`.
 - Privacy has an analytics on/off switch (`ConsentSettings`) stored on the device for 12 months (`shared/analytics/utils/analyticsConsent.ts`). Turning it off sends `analytics_opted_out`, stops replays and opts PostHog out; turning it on loads or resumes PostHog.
 - Page chrome: `AppShell` renders `SiteFooter` on every screen (`footer={false}` to hide, `footerSource` for the signup source; defaults to the path). Text pages (About, How we pick, List with us, Help, `/legal/*`) live in `src/app/(info)/` and share `InfoShell` (nav, tab bar, gutters, footer).
+
+## Assistant (MCP)
+
+- Module `discovr-backend/api/src/assistant` (facade `AssistantService`, tools in `application/tools.ts`, input shapes in `domain/listing-input.ts`). Route: `http/mcp-routes.ts`. Stateless Streamable HTTP, SDK `@modelcontextprotocol/sdk`.
+- Tools: `find_hosts`, `list_listings` (read); `create_host_draft` (host `active: false`), `create_listing_draft` (`status: "draft"`, create then patch for hours / content / FAQs). Draft state is fixed in code, the AI cannot publish. Text only: no photos yet, ops adds them in the admin edit page.
+- The AI uses ops' own subscription, so we pay no tokens.
+- **OAuth is a stub**: `/.well-known/*`, `/oauth/register|authorize|token` auto-approve, `/mcp` accepts any bearer token. Anyone with the API URL can use it. Replace with real admin login before sharing the URL.
+- Env: `ADMIN_URL` (optional, default `https://discovr-admin.vercel.app`) builds the review links the tools return.
+- Check: `cd discovr-backend/api && npx tsx scripts/check-assistant.ts`.
+- Not done: photos, edit tools, `ai_draft` flag, tool-call log, timeline / process steps (the guest app hardcodes "The Process").
