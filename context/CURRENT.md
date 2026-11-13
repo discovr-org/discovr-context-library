@@ -143,7 +143,7 @@ Guest app feed, search, saved, and experience detail load only from `/v1/catalog
 
 ## Trip end prompt ("Till when are you in Goa?")
 
-- `discovr-frontend/src/features/trip`: `TripEndGate` (mounted in `Providers`) shows the non-dismissible `TripEndPrompt` once per visit after 30 s of use (tab visible, touched or scrolled in the last 15 s), if there is no answer or `askAgainOn` has come. It waits while the sign-in sheet is open.
+- `discovr-frontend/src/features/trip`: `TripEndGate` (mounted in `Providers`) shows the non-dismissible `TripEndPrompt` once per visit after 10 s of use (tab visible, touched or scrolled in the last 15 s), if there is no answer or `askAgainOn` has come. It waits while the sign-in sheet is open.
 - Signed in: the API is the source of truth (`GET /v1/auth/me` → `user.trip`; `PUT /v1/me/trip`). Guests: answer lives in `localStorage` (`discovr.trip`) and moves up to the DB on sign-in if the DB has none.
 - PostHog person gets `trip_status` and `trip_last_day`; events `trip_end_shown`, `trip_end_answered`.
 - Device location events also carry `device_city/state/country`, looked up once via BigDataCloud (`api-bdc.io`, spot rounded to ~1 km). Privacy page names both.
