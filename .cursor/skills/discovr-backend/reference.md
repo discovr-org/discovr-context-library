@@ -74,6 +74,7 @@ discovr-backend/api/src/
 - Routes (Bearer session): `GET/PUT /v1/me/saves`, `PUT/DELETE /v1/me/saves/:slug`.
 - `PATCH /v1/me` `{ name }` (Bearer) sets first name; OTP verify returns `isNewUser` = no name yet.
 - `PUT /v1/me/trip` `{ status: date|later|local|not_yet, lastDay? }` (Bearer) saves "Till when are you in Goa?" (migration `018_trip_end.sql`: `trip_status`, `trip_last_day`, `trip_ask_again_on`). Server sets `askAgainOn` = last day (or answer day for not_yet) + 3 days; `local` = never. Every user payload (`/v1/auth/me`, verify, `PATCH /v1/me`) carries `trip` (null until answered).
+- PWA login handoff (migration `019_auth_handoffs.sql`): `POST /v1/auth/handoff` (Bearer) → `{ code }` (32 random bytes, hashed at rest, 30 min, one use); `POST /v1/auth/handoff/exchange` `{ code }` (public, 10 per 10 min per IP) → `{ sessionId, user, isNewUser }`, a brand new 30-day session. Consume is one atomic UPDATE. iOS Home Screen apps start with empty storage; this moves a signed-in browser's login into the app.
 - `POST /v1/host-applications` (public) stores the List with us form in `host_applications`.
 - `POST /v1/help-requests` (public) stores the Help form in `help_requests`.
 - Guest PWA keeps slugs in `localStorage` until login, then syncs via `PUT /v1/me/saves`.

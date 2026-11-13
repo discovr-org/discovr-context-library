@@ -147,3 +147,9 @@ Guest app feed, search, saved, and experience detail load only from `/v1/catalog
 - Signed in: the API is the source of truth (`GET /v1/auth/me` → `user.trip`; `PUT /v1/me/trip`). Guests: answer lives in `localStorage` (`discovr.trip`) and moves up to the DB on sign-in if the DB has none.
 - PostHog person gets `trip_status` and `trip_last_day`; events `trip_end_shown`, `trip_end_answered`.
 - Device location events also carry `device_city/state/country`, looked up once via BigDataCloud (`api-bdc.io`, spot rounded to ~1 km). Privacy page names both.
+
+## PWA login handoff (iOS)
+
+- An iOS Home Screen app has its own empty storage, so a signed-in person would be asked to sign in again. Signed in on iOS in the browser, `PwaHandoff` (`features/auth/components`) asks `POST /v1/auth/handoff` once per session and points `<link rel="manifest">` at `/manifest.webmanifest?h=<code>`. That route (`src/app/manifest.webmanifest/route.ts`, replaces `manifest.ts`, never cached, SW is network-only for it) sets `start_url` to `/?h=<code>`.
+- First launch of the app: `PwaHandoff` strips `?h=` from the address, swaps the code for the app's own session, reloads. If it fails, normal sign-in. PostHog `before_send` scrubs `h=` from every URL it would send.
+- Limits: needs iOS 16.4+ reading the manifest at Add to Home Screen; code lives 30 min. The reverse (PWA login into Safari or WhatsApp's browser) is not possible; each browser signs in once. Logging out in one place does not log out the other.
