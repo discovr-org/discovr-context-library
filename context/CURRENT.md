@@ -157,7 +157,6 @@ Guest app feed, search, saved, and experience detail load only from `/v1/catalog
 - First launch of the app: `PwaHandoff` strips `?h=` from the address, swaps the code for the app's own session, reloads. If it fails, normal sign-in. PostHog `before_send` scrubs `h=` from every URL it would send.
 - Limits: needs iOS 16.4+ reading the manifest at Add to Home Screen; code lives 30 min. The reverse (PWA login into Safari or WhatsApp's browser) is not possible; each browser signs in once. Logging out in one place does not log out the other.
 
-<<<<<<< HEAD
 ## Listing page builder (admin edit screen + guest page)
 
 - Admin `/listings/[id]` is a full-screen editor: Layers | Widgets / Edit tabs | phone preview. Undo/redo (⌘Z / ⇧⌘Z) cover layout only (story blocks, section order, what is shown). "Start a custom story" seeds `content.blocks` from the fields; after that the guest page stops reading those fields for the story.
@@ -173,7 +172,6 @@ Guest app feed, search, saved, and experience detail load only from `/v1/catalog
 - Admin: Categories screen (`/categories`, `/categories/[id]`: same builder as the listing editor; previews on a sample listing via `POST /v1/admin/experiences/:id/preview` with `categoryId` + `categoryLayout`). Routes `GET/POST /v1/admin/categories`, `GET/PATCH/DELETE /v1/admin/categories/:id` (delete refused while listings use it). Add listing picks a category; a listing in a category shows its layout locked and the editor jumps to the field a block reads. Existing listings move over one at a time (Basics → Category); nothing is converted automatically.
 - The categories fetch and `category_id` reads are defensive, so a database without the migration still loads every listing.
 
-=======
 ## Admin messages (WhatsApp via BotSpace)
 
 - `discovr-admin` has a login screen (`AdminGate`, token in `localStorage` as `discovr.adminToken`) and a Messages page (`/messages`, `G M`): filter (signed up today / 7 days / everyone / in Goa leaving within N days), pick a template with a WhatsApp-style preview, tick or untick people, confirm, then see each result and refresh delivery status.
@@ -186,4 +184,3 @@ Guest app feed, search, saved, and experience detail load only from `/v1/catalog
 - A brand-new user (phone not seen before) gets one BotSpace template about 2 min after OTP verify, so they can add a name first. Template text uses `{{1}}` = first name, or "there" if they skipped it. Returning users get nothing.
 - Queue = table `welcome_jobs` (one row per user) + an in-process poller in the API. Survives restarts; 3 retries 5 min apart, then `failed`.
 - Set `BOTSPACE_WELCOME_TEMPLATE_ID` to the approved template's id. Unset = feature off.
->>>>>>> fc48caa (Update context: welcome WhatsApp queue, BotSpace env, admin messages)
